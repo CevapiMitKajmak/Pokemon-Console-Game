@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 
 namespace Pokemon_Console_Game.Classes
 {
-    public class Pokemon
+    internal class Opponent : Pokemon
     {
-        public string name;
-        public double health;
-        public double damage;
+        
+        public double EnemyAttack()
+        {
+            return 0;
+        }
+        
     }
 }
