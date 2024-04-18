@@ -1,5 +1,7 @@
 ﻿using Pokemon_Console_Game.Classes;
+using System.ComponentModel.Design;
 using System.Linq.Expressions;
+using System.Threading.Channels;
 using static Pokemon_Console_Game.Classes.Pokemon;
 
 namespace Pokemon_Console_Game
@@ -14,8 +16,8 @@ namespace Pokemon_Console_Game
             Proponent mewtwo = new Proponent();
             mewtwo.name = "Mewtwo";
             mewtwo.health = 250;
-            mewtwo.damage = 30;
-            
+            mewtwo.damage = 1000;
+
             Proponent charizard = new Proponent();
             charizard.name = "Charizard";
             charizard.health = 400;
@@ -32,13 +34,13 @@ namespace Pokemon_Console_Game
             gengar.name = "Gengar";
             gengar.health = 100;
             gengar.damage = 50;
-            
+
 
             Opponent rayquaza = new Opponent();
             rayquaza.name = "Rayquaza";
             rayquaza.health = 500;
             rayquaza.damage = 70;
-            
+
             Opponent lucario = new Opponent();
             lucario.name = "Lucario";
             lucario.health = 200;
@@ -68,47 +70,86 @@ namespace Pokemon_Console_Game
             opponents.Add(lugia);
             opponents.Add(dragonite);
 
-            Console.WriteLine("Wähle ein Pokemon aus zum kämpfen:");
-            Console.WriteLine();
-            int indexselecter = 0;
-            foreach (Proponent proponent in proponents)
+
+
+            while (proponents.Count >= 0 || opponents.Count >= 0)
             {
-                Console.WriteLine(indexselecter + " " + proponent.name);
-                indexselecter++;
+                Console.WriteLine("Möchtest du Kämpfen? [Ja/Nein]\n");
+                string? input = Console.ReadLine();
+
+                if (input == "Ja")
+                {
+
+                    Console.WriteLine("Wähle ein Pokemon aus zum kämpfen:");
+                    Console.WriteLine();
+                    int indexselecter = 0;
+                    foreach (Proponent proponent in proponents)
+                    {
+                        Console.WriteLine(indexselecter + " " + proponent.name);
+                        indexselecter++;
+                    }
+
+                    int chosenFriendlyPokemon = Convert.ToInt32(Console.ReadLine());
+                    //Doesnt work, I WILL FIX IT LATER
+                    if (chosenFriendlyPokemon < 0 || chosenFriendlyPokemon > proponents.Count)
+                    {
+                        Console.WriteLine("Falsche eingabe \n");
+                    }
+
+
+                    Console.WriteLine($"Dein ausgewähltes Pokemon ist {proponents[chosenFriendlyPokemon].name}\n");
+
+
+                    Console.WriteLine("Wähle ein Pokemon aus, gegen welches du kämpfen möchtest: \n");
+                    indexselecter = 0;
+
+                    foreach (Opponent opponent in opponents)
+                    {
+                        Console.WriteLine(indexselecter + " " + opponent.name);
+                        indexselecter++;
+                    }
+
+                    int chosenEnemyPokemon = Convert.ToInt32(Console.ReadLine());
+
+                    Console.WriteLine($"Dein ausgewähltes Pokemon ist {opponents[chosenEnemyPokemon].name} \n");
+
+
+                    //Attack Friendly to Enemy 
+
+                    proponents[chosenFriendlyPokemon].FriendlyAttack(opponents[chosenEnemyPokemon]);
+
+                    Console.WriteLine($"Du hast {proponents[chosenFriendlyPokemon].damage} Schaden bei {opponents[chosenEnemyPokemon].name} angerichtet!");
+
+                    if (opponents[chosenEnemyPokemon].health <= 0)
+                    {
+                        Console.WriteLine($"Du hast {opponents[chosenEnemyPokemon].name} besiegt.");
+                        opponents.Remove(opponents[chosenEnemyPokemon]);
+
+                    }
+                    else if (opponents[chosenEnemyPokemon].health >= 0)
+                    {
+                        opponents[chosenEnemyPokemon].EnemyAttack(proponents[chosenFriendlyPokemon]);
+
+                        Console.WriteLine($"{opponents[chosenEnemyPokemon].name} hat zurückgeschlagen und hat {opponents[chosenEnemyPokemon].damage} Schaden bei {proponents[chosenFriendlyPokemon].name} angerichtet");
+                    }
+                    if (proponents[chosenFriendlyPokemon].health <= 0)
+                    {
+                        Console.WriteLine($"Dein {proponents[chosenFriendlyPokemon].name} wurde besiegt.");
+                        proponents.Remove(proponents[chosenFriendlyPokemon]);
+                    }
+                }
+                else if (input == "Nein")
+                {
+                    Console.WriteLine("Bis zum nächsten Mal");
+                    Environment.Exit(0);
+                }
+                else if (input != "Ja" || input != "Nein")
+                {
+                    Console.WriteLine("Bitte 'Ja' oder 'Nein' eingeben.");
+                }
             }
-
-            int chosenFriendlyPokemon = Convert.ToInt32(Console.ReadLine());
-            //Doesnt work, I WILL FIX IT LATER
-            if (chosenFriendlyPokemon < 0 || chosenFriendlyPokemon > proponents.Count)
-            {
-                Console.WriteLine("Falsche eingabe");
-            }
-
-
-            Console.WriteLine("Dein ausgewähltes Pokemon ist " + proponents[chosenFriendlyPokemon].name);
-            Console.WriteLine();
-
-            Console.WriteLine("Wähle ein Pokemon aus, gegen welches du kämpfen möchtest:");
-            Console.WriteLine();
-            indexselecter = 0;
-
-            foreach (Opponent opponent in opponents)
-            {
-                Console.WriteLine(indexselecter + " " + opponent.name);
-                indexselecter++;
-            }
-
-            int chosenEnemyPokemon = Convert.ToInt32(Console.ReadLine());
-
-            Console.WriteLine("Dein ausgewähltes Pokemon ist " + opponents[chosenEnemyPokemon].name);
-            Console.WriteLine();
-
-            //Attack Friendly to Enemy
-
-            proponents[chosenFriendlyPokemon].FriendlyAttack(opponents[chosenEnemyPokemon]);
-
-            Console.WriteLine(opponents[chosenEnemyPokemon].health);
-
         }
     }
 }
+
+
